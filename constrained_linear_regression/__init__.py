@@ -18,7 +18,9 @@ class ConstrainedLinearRegression(LinearModel, RegressorMixin):
             lasso=0,
             tol=1e-15,
             learning_rate=1.0,
-            max_iter=10000
+            max_iter=10000, 
+            min_coef=None, 
+            max_coef=None
     ):
         self.fit_intercept = fit_intercept
         self.normalize = normalize
@@ -29,8 +31,10 @@ class ConstrainedLinearRegression(LinearModel, RegressorMixin):
         self.tol = tol
         self.learning_rate = learning_rate
         self.max_iter = max_iter
+        self.min_coef = min_coef
+        self.max_coef = max_coef
 
-    def fit(self, X, y, min_coef=None, max_coef=None):
+    def fit(self, X, y):
         X, y = check_X_y(X, y, accept_sparse=['csr', 'csc', 'coo'], y_numeric=True, multi_output=False)
         X, y, X_offset, y_offset, X_scale = _preprocess_data(
             X,
@@ -39,8 +43,8 @@ class ConstrainedLinearRegression(LinearModel, RegressorMixin):
             normalize=self.normalize,
             copy=self.copy_X,
         )
-        self.min_coef_ = min_coef if min_coef is not None else np.repeat(-np.inf, X.shape[1])
-        self.max_coef_ = max_coef if max_coef is not None else np.repeat(np.inf, X.shape[1])
+        self.min_coef_ = self.min_coef if self.min_coef is not None else np.repeat(-np.inf, X.shape[1])
+        self.max_coef_ = self.max_coef if self.max_coef is not None else np.repeat(np.inf, X.shape[1])
         if self.nonnegative:
             self.min_coef_ = np.clip(self.min_coef_, 0, None)
 
