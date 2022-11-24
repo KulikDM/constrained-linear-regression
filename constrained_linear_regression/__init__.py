@@ -71,10 +71,7 @@ class ConstrainedLinearRegression(LinearModel, RegressorMixin):
                 if self.lasso:
                     #
                     new_value2 = beta[i] - (grad[i] + np.sign(prev_value or new_value) * self.lasso * loss_scale) / hessian[i,i] * self.learning_rate
-                    if new_value2 * new_value < 0:
-                        new_value = 0
-                    else:
-                        new_value = new_value2
+                    new_value = 0 if new_value2 * new_value < 0 else new_value2
                 beta[i] = np.clip(new_value, self.min_coef_[i], self.max_coef_[i])
 
         self.coef_ = beta
